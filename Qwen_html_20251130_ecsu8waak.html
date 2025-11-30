@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Мои разработки</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;600&display=swap" rel="stylesheet">
+  <style>
+    /* Пастельная палитра */
+    :root {
+      --bg-color: #cfc1b5;          /* Светло-бежевый фон */
+      --card-bg: #ffffff;           /* Белые карточки */
+      --accent: #73dd98;            /* Мятный акцент */
+      --text: #0d0d0d;              /* Нейтральный текст */
+      --price: #ff9a8b;             /* Персиковая цена */
+      --shadow: rgba(0,0,0,0.06);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text);
+      padding: 40px 20px;
+      line-height: 1.6;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 50px;
+    }
+
+    h1 {
+      font-size: 2.4rem;
+      font-weight: 600;
+      color: #1e045f; /* Мягкий лавандовый */
+      margin-bottom: 12px;
+    }
+
+    .subtitle {
+      font-size: 1.1rem;
+      color: #96119f;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    /* Сетка товаров — 4 карточки */
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 30px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    /* Карточка товара */
+    .product-card {
+      background: var(--card-bg);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 6px 20px var(--shadow);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .product-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 10px 25px var(--shadow);
+    }
+
+    .product-card img {
+      width: 100%;
+      height: 160px;
+      object-fit: cover;
+    }
+
+    .product-info {
+      padding: 20px;
+    }
+
+    .product-info h3 {
+      font-size: 1.3rem;
+      margin-bottom: 10px;
+      color: #4a4a4a;
+    }
+
+    .product-info p {
+      font-size: 0.95rem;
+      color: #777;
+      margin-bottom: 14px;
+    }
+
+    .product-price {
+      font-weight: 600;
+      font-size: 1.25rem;
+      color: var(--price);
+      margin-bottom: 12px;
+    }
+
+    .buy-btn {
+      width: 100%;
+      padding: 10px;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .buy-btn:hover {
+      background: #8ac6a5;
+    }
+
+    /* Модальное окно */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(4px);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .modal-content {
+      background: white;
+      border-radius: 20px;
+      width: 90%;
+      max-width: 800px;
+      overflow: hidden;
+      box-shadow: 0 15px 50px rgba(0,0,0,0.2);
+      position: relative;
+    }
+
+    .modal-header {
+      background: var(--accent);
+      color: white;
+      padding: 20px;
+      position: relative;
+    }
+
+    .modal-header h2 {
+      font-size: 1.6rem;
+    }
+
+    .close-btn {
+      position: absolute;
+      top: 15px;
+      right: 20px;
+      background: none;
+      border: none;
+      font-size: 28px;
+      color: white;
+      cursor: pointer;
+    }
+
+    .modal-body {
+      padding: 25px;
+    }
+
+    /* Карусель */
+    .carousel {
+      position: relative;
+      width: 100%;
+      height: 320px;
+      margin-bottom: 20px;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .carousel img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: none;
+    }
+
+    .carousel img.active {
+      display: block;
+    }
+
+    .carousel-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(255, 255, 255, 0.8);
+      border: none;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      font-size: 18px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+    }
+
+    .prev { left: 15px; }
+    .next { right: 15px; }
+
+    .modal-description {
+      margin: 15px 0;
+      font-size: 1.05rem;
+      color: #555;
+    }
+
+    .modal-price {
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: var(--price);
+      margin: 15px 0;
+    }
+
+    .modal-buy-btn {
+      padding: 12px 24px;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .modal-buy-btn:hover {
+      background: #8ac6a5;
+    }
+
+    @media (max-width: 600px) {
+      h1 { font-size: 2rem; }
+      .carousel { height: 220px; }
+      .modal-body { padding: 15px; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Мои разработки</h1>
+    <p class="subtitle">Всё для изучения английского</p>
+  </header>
+
+  <!-- СЕТКА ИЗ 4 ТОВАРОВ -->
+  <div class="products-grid">
+    <!-- Товар 1 -->
+    <div class="product-card">
+      <img src="https://img.freepik.com/free-photo/enchanted-christmas-decoration-tree_23-2151890904.jpg?semt=ais_hybrid" alt="Интересная игра" />
+      <div class="product-info">
+        <h3>Интересная игра</h3>
+        <p>Помоги львенку собрать фрукты</p>
+        <div class="product-price">500₽</div>
+        <button class="buy-btn" onclick="openModal(1)">Купить</button>
+      </div>
+    </div>
+
+    <!-- Товар 2 -->
+    <div class="product-card">
+      <img src="https://img.freepik.com/free-photo/still-life-christmas-decoration-with-copy-space_23-2151868696.jpg?semt=ais_hybrid" alt="VS Code Plugin" />
+      <div class="product-info">
+        <h3>Тест</h3>
+        <p>Пройди тест и узнай свой уровень языка</p>
+        <div class="product-price">200₽</div>
+        <button class="buy-btn" onclick="openModal(2)">Купить</button>
+      </div>
+    </div>
+
+    <!-- Товар 3 -->
+    <div class="product-card">
+      <img src="https://i.pinimg.com/736x/53/98/2d/53982d30145337044dfeb64e3828c5dc.jpg" alt="Dashboard Template" />
+      <div class="product-info">
+        <h3>Worksheets</h3>
+        <p>Разработки по всем темам</p>
+        <div class="product-price">1000 ₽</div>
+        <button class="buy-btn" onclick="openModal(3)">Купить</button>
+      </div>
+    </div>
+
+    <!-- Товар 4 -->
+    <div class="product-card">
+      <img src="https://img.freepik.com/free-photo/christmas-snow-globe-with-christmas-tree-illustration_23-2151846417.jpg?semt=ais_hybrid&w=740" alt="API Kit" />
+      <div class="product-info">
+        <h3>Картинки</h3>
+        <p>Классные картинки</p>
+        <div class="product-price">2 790 ₽</div>
+        <button class="buy-btn" onclick="openModal(4)">Купить</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- МОДАЛЬНОЕ ОКНО -->
+  <div id="productModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="modal-title">Подробности продукта</h2>
+        <button class="close-btn" onclick="closeModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="carousel" id="modal-carousel">
+          <!-- Изображения будут добавлены через JS -->
+        </div>
+        <div class="modal-description" id="modal-description">
+          Описание появится здесь.
+        </div>
+        <div class="modal-price" id="modal-price">Цена</div>
+        <button class="modal-buy-btn" id="modal-buy-btn">Купить сейчас</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ДАННЫЕ ПО 4 ТОВАРАМ
+    const products = {
+      1: {
+        title: "Интересная игра",
+        images: [
+          "https://img.freepik.com/free-photo/still-life-christmas-decoration-with-copy-space_23-2151868696.jpg?semt=ais_hybrid",
+          "https://i.pinimg.com/736x/53/98/2d/53982d30145337044dfeb64e3828c5dc.jpg",
+          "https://wallpapers.com/images/hd/christmas-eve-by8e1cqb82nxon2h.jpg"
+        ],
+        description: "Интересно и познавательно",
+        price: "500₽",
+        buyLink: "#"
+      },
+      2: {
+        title: "Тест",
+        images: [
+          "https://i.pinimg.com/736x/53/98/2d/53982d30145337044dfeb64e3828c5dc.jpg",
+        ],
+        description: "Узнай уровень",
+        price: "200₽",
+        buyLink: "#"
+      },
+      3: {
+        title: "Worksheets",
+        images: [
+          "https://wallpapers.com/images/hd/christmas-eve-by8e1cqb82nxon2h.jpg",
+        ],
+        description: "Разработки по всем темам",
+        price: "1000₽",
+        buyLink: "#"
+      },
+      4: {
+        title: "Картинки",
+        images: [
+          "https://img.freepik.com/free-photo/enchanted-christmas-decoration-tree_23-2151890904.jpg?semt=ais_hybrid",
+        ],
+        description: "Красивые картинки",
+        price: "2 790 ₽",
+        buyLink: "#"
+      }
+    };
+
+    let currentSlide = 0;
+
+    function openModal(id) {
+      const product = products[id];
+      if (!product) return;
+
+      document.getElementById("modal-title").textContent = product.title;
+      document.getElementById("modal-description").textContent = product.description;
+      document.getElementById("modal-price").textContent = product.price;
+
+      const carousel = document.getElementById("modal-carousel");
+      carousel.innerHTML = "";
+
+      product.images.forEach((src, i) => {
+        const img = document.createElement("img");
+        img.src = src;
+        if (i === 0) img.classList.add("active");
+        carousel.appendChild(img);
+      });
+
+      document.getElementById("modal-buy-btn").onclick = () => {
+        // Замените на window.location.href = product.buyLink; когда добавите ссылки
+        alert(`Вы выбрали: ${product.title}\nПереход к оплате...`);
+      };
+
+      currentSlide = 0;
+      document.getElementById("productModal").style.display = "flex";
+    }
+
+    function closeModal() {
+      document.getElementById("productModal").style.display = "none";
+    }
+
+    function showSlide(index) {
+      const slides = document.querySelectorAll("#modal-carousel img");
+      const total = slides.length;
+
+      if (index >= total) currentSlide = 0;
+      else if (index < 0) currentSlide = total - 1;
+      else currentSlide = index;
+
+      slides.forEach((img, i) => {
+        img.classList.toggle("active", i === currentSlide);
+      });
+    }
+
+    // Добавляем кнопки навигации в карусель
+    window.addEventListener("load", () => {
+      const carousel = document.getElementById("modal-carousel");
+
+      ["prev", "next"].forEach(dir => {
+        const btn = document.createElement("button");
+        btn.className = `carousel-btn ${dir}`;
+        btn.innerHTML = dir === "prev" ? "‹" : "›";
+        btn.onclick = () => showSlide(currentSlide + (dir === "next" ? 1 : -1));
+        carousel.appendChild(btn);
+      });
+    });
+
+    // Закрытие модалки по клику на фон
+    document.getElementById("productModal").onclick = (e) => {
+      if (e.target === document.getElementById("productModal")) {
+        closeModal();
+      }
+    };
+  </script>
+</body>
+</html>
